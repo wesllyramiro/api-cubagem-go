@@ -2,7 +2,7 @@ package volume
 
 type IService interface {
 	BuscarModeloVolume(int) (ModeloVolume, error)
-	RealizarCubagem(int, int) []Endereco
+	RealizarCubagem(int, int) ([]Endereco, error)
 }
 
 type service struct {
@@ -18,8 +18,21 @@ func (s *service) BuscarModeloVolume(id int) (ModeloVolume, error) {
 
 	return vol, err
 }
-func (s *service) RealizarCubagem(filial int, idModelo int) []Endereco {
-	end, _ := s.r.BuscarProdutosCubagem(filial, false)
+func (s *service) RealizarCubagem(filial int, idModelo int) ([]Endereco, error) {
 
-	return end
+	modelo, err := s.r.BuscarModeloVolume(idModelo)
+	if err != nil {
+		return nil, err
+	}
+
+	enderecos, err := s.r.BuscarProdutosCubagem(filial, false)
+	if err != nil {
+		return nil, err
+	}
+
+	for _, endereco := range enderecos {
+
+	}
+
+	return enderecos, err
 }
