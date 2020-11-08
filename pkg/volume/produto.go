@@ -6,6 +6,11 @@ type Produto struct {
 	Quantidade    int    `json:"quantidade"`
 	EstoqueMinimo int    `json:"estoqueMinimo"`
 }
+
+func (p *Produto) AdicionarQuantidade(qtd int) {
+	p.Quantidade = qtd
+}
+
 type ProdutoDetalhe struct {
 	Codigo           int
 	Filial           int
@@ -21,4 +26,8 @@ type ProdutoDetalhe struct {
 	EnderecoDeposito string
 	VolumeProduto    float64
 	EnderecoReduzido string
+}
+
+func (p *ProdutoDetalhe) TotalVolume() float64 {
+	return p.VolumeProduto * float64(p.QtdProduto)
 }
