@@ -26,7 +26,9 @@ func (v *Volume) ProdutoCabeNoVolume(p ProdutoDetalhe) {
 	}
 }
 
-func (v *Volume) AdicionarProduto(p Produto, volumeDoProduto float64) {
+func (v *Volume) AdicionarProduto(p Produto, volumeDoProduto float64, qtd int) {
+	p.AdicionarQuantidade(qtd)
+
 	v.VolumeRestante -= float64(p.Quantidade) * volumeDoProduto
 	v.Produtos = append(v.Produtos, p)
 }

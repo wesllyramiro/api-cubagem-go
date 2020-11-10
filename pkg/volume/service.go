@@ -39,22 +39,25 @@ func (s *service) RealizarCubagem(filial int, idModelo int) ([]Endereco, error) 
 
 func AdicionarProdutoAoVolume(e Endereco, m ModeloVolume) {
 	var v Volume
+	var vs []Volume
+
 	v.CalcularVolume(m)
 
-	for _, produto := range e.Produtos {
+	for _, pr := range e.Produtos {
 		p := Produto{
-			Codigo:        produto.Codigo,
-			Endereco:      produto.EnderecoDeposito,
-			EstoqueMinimo: produto.EstoqueMinino}
+			Codigo:        pr.Codigo,
+			Endereco:      pr.EnderecoDeposito,
+			EstoqueMinimo: pr.EstoqueMinino}
 
-		qtd := v.QunatidadeCabeNoVolume(produto)
+		qtd := v.QunatidadeCabeNoVolume(pr)
 
-		if qtd < produto.QtdProduto {
-			p.AdicionarQuantidade(qtd)
-			v.AdicionarProduto(p, produto.VolumeProduto)
+		if qtd < pr.QtdProduto {
+			if qtd > 0 {
+				v.AdicionarProduto(p, pr.VolumeProduto, qtd)
+			}
+			vs = append(vs, v)
 		} else {
-			p.AdicionarQuantidade(produto.QtdProduto)
-			v.AdicionarProduto(p, produto.VolumeProduto)
+			v.AdicionarProduto(p, pr.VolumeProduto, pr.QtdProduto)
 		}
 	}
 }
