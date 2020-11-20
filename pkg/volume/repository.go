@@ -39,20 +39,12 @@ func (r *repository) BuscarModeloVolume(id int) (ModeloVolume, error) {
 
 const BuscarDetalheProduto = `		
 		SELECT 
-				SUBSTRING(EnderecoDeposito, 1,7)	as EnderecoReduzido
-				,Codigo								as Produtos_Codigo
-				,Filial								as Produtos_Filial					
-				,DescricaoFilial					as Produtos_DescricaoFilial				
-				,Digito								as Produtos_Digito
-				,Descricao							as Produtos_Descricao
-				,TipoProduto						as Produtos_TipoProduto
-				,VlVenda							as Produtos_VlVenda
-				,EstoqueMinino						as Produtos_EstoqueMinino
-				,QuantidadeEnviar					as Produtos_QuantidadeEnviar
-				,Barras								as Produtos_Barras				
-				,QtdProduto							as Produtos_QtdProduto
-				,EnderecoDeposito					as Produtos_EnderecoDeposito				
-				,VolumeProduto						as Produtos_VolumeProduto
+			 SUBSTRING(EnderecoDeposito, 1,7)	as EnderecoReduzido
+			,Codigo								as Produtos_Codigo
+			,EstoqueMinino						as Produtos_EstoqueMinino		
+			,QtdProduto							as Produtos_QtdProduto
+			,EnderecoDeposito					as Produtos_EnderecoDeposito				
+			,VolumeProduto						as Produtos_VolumeProduto
 		FROM 
 				VW_OBTER_PRODUTOS_REVERSA
 		WHERE 
@@ -90,15 +82,7 @@ func (r *repository) BuscarProdutosCubagem(filial int, isPsico bool) ([]Endereco
 		rows.Scan(
 			&p.EnderecoReduzido,
 			&p.Codigo,
-			&p.Filial,
-			&p.DescricaoFilial,
-			&p.Digito,
-			&p.Descricao,
-			&p.TipoProduto,
-			&p.VlVenda,
 			&p.EstoqueMinino,
-			&p.QuantidadeEnviar,
-			&p.Barras,
 			&p.QtdProduto,
 			&p.EnderecoDeposito,
 			&p.VolumeProduto)

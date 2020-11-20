@@ -5,27 +5,35 @@ type Produto struct {
 	Endereco      string `json:"endereco"`
 	Quantidade    int    `json:"quantidade"`
 	EstoqueMinimo int    `json:"estoqueMinimo"`
+	Volumetria	  float64 
 }
 
-func (p *Produto) AdicionarQuantidade(qtd int) {
+func (p *Produto) AlterarQuantidade(qtd int) {
 	p.Quantidade = qtd
+}
+func (p *Produto) VolumetriaTotal() float64 {
+	return p.Volumetria * float64(p.Quantidade)
 }
 
 type ProdutoDetalhe struct {
 	Codigo           int
-	Filial           int
-	DescricaoFilial  string
-	Digito           int
-	Descricao        string
-	TipoProduto      string
-	VlVenda          float64
 	EstoqueMinino    int
-	QuantidadeEnviar int
-	Barras           string
 	QtdProduto       int
 	EnderecoDeposito string
 	VolumeProduto    float64
 	EnderecoReduzido string
+}
+
+func (p *ProdutoDetalhe) DiminuirQtdJaAddNoVolume(qtd int) {
+	p.QtdProduto -= qtd
+}
+
+func (p *ProdutoDetalhe) AindaTemQuantidade() bool {
+	if p.QtdProduto > 0 {
+		return true
+	}else {
+		return false
+	} 
 }
 
 func (p *ProdutoDetalhe) TotalVolume() float64 {

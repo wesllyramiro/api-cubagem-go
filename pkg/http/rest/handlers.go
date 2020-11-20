@@ -29,18 +29,24 @@ type encaixotarProdutosRequest struct {
 
 func EncaixotarProdutos(s volume.IService) func(c *gin.Context) {
 	return func(ctx *gin.Context) {
-		// var req encaixotarProdutosRequest
-		// if err := ctx.ShouldBindQuery(&req); err != nil {
-		// 	ctx.JSON(http.StatusBadRequest, errorResponse(err))
-		// 	return
-		// }
-
 		id, _ := strconv.Atoi(ctx.Query("IdModelo"))
 		filial, _ := strconv.Atoi(ctx.Query("Filial"))
+		
+		psico := [2]bool { true, false }
 
-		end := s.RealizarCubagem(filial, id)
+		var vs []volume.Volume
 
-		ctx.JSON(http.StatusOK, end)
+		for _, isPsico := range psico {
+			vls, err := s.RealizarCubagem(filial, id, isPsico)
+
+			if err != nil {
+				ctx.JSON(http.StatusBadRequest, err) 
+			}
+
+			vs = append(vs, vls...)
+		}
+		
+		ctx.JSON(http.StatusOK, vs)
 	}
 }
 func errorResponse(err error) gin.H {

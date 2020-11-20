@@ -2,7 +2,7 @@ package volume
 
 type IService interface {
 	BuscarModeloVolume(int) (ModeloVolume, error)
-	RealizarCubagem(int, int) ([]Endereco, error)
+	RealizarCubagem(int, int, bool) ([]Volume, error)
 }
 
 type service struct {
@@ -18,46 +18,58 @@ func (s *service) BuscarModeloVolume(id int) (ModeloVolume, error) {
 
 	return vol, err
 }
-func (s *service) RealizarCubagem(filial int, idModelo int) ([]Endereco, error) {
+func (s *service) RealizarCubagem(filial int, idModelo int, isPsico bool) ([]Volume, error) {
 
 	modelo, err := s.r.BuscarModeloVolume(idModelo)
 	if err != nil {
 		return nil, err
 	}
 
-	enderecos, err := s.r.BuscarProdutosCubagem(filial, false)
+	enderecos, err := s.r.BuscarProdutosCubagem(filial, isPsico)
 	if err != nil {
 		return nil, err
 	}
 
-	for _, endereco := range enderecos {
-		AdicionarProdutoAoVolume(endereco, modelo)
-	}
-
-	return enderecos, err
-}
-
-func AdicionarProdutoAoVolume(e Endereco, m ModeloVolume) {
-	var v Volume
 	var vs []Volume
 
-	v.CalcularVolume(m)
+	var v Volume
+	v.CalcularVolume(modelo)
 
-	for _, pr := range e.Produtos {
+	for _, endereco := range enderecos {
+		for endereco.AindaTemProduto() {
+
+			vl := AdicionarProdutoAoVolume(&endereco, modelo, &vs, &v)
+
+			if vl != nil {
+				vs = append(vs, v)
+
+				v = Volume{}
+				v.CalcularVolume(modelo)
+			}
+		}
+	}
+
+	return vs, err
+}
+
+func AdicionarProdutoAoVolume(e *Endereco, m ModeloVolume, vs *[]Volume, v *Volume) *Volume {
+
+	for _, pr := range e.ProdutosComQuntidade() {
 		p := Produto{
 			Codigo:        pr.Codigo,
 			Endereco:      pr.EnderecoDeposito,
-			EstoqueMinimo: pr.EstoqueMinino}
+			EstoqueMinimo: pr.EstoqueMinino,
+			Quantidade:    pr.QtdProduto,
+			Volumetria:    pr.VolumeProduto	}
 
-		qtd := v.QunatidadeCabeNoVolume(pr)
+		qtdAdicionado := v.AdicionarProduto(p)
 
-		if qtd < pr.QtdProduto {
-			if qtd > 0 {
-				v.AdicionarProduto(p, pr.VolumeProduto, qtd)
-			}
-			vs = append(vs, v)
-		} else {
-			v.AdicionarProduto(p, pr.VolumeProduto, pr.QtdProduto)
-		}
+		e.DiminuirQtdJaAddNoVolume(pr, qtdAdicionado)
+	}
+
+	if e.AindaTemProduto() {
+		return v
+	}else {
+		return nil
 	}
 }

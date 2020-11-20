@@ -12,25 +12,60 @@ func (v *Volume) CalcularVolume(m ModeloVolume) {
 	v.VolumeRestante = m.CalcularVolume()
 }
 
-func (v *Volume) QunatidadeCabeNoVolume(p ProdutoDetalhe) int {
-	result := (v.VolumeRestante / p.VolumeProduto)
+func (v *Volume) QunatidadeCabeNoVolume(p Produto) int {
+	result := (v.VolumeRestante / p.Volumetria)
 
 	return int(result)
 }
 
-func (v *Volume) ProdutoCabeNoVolume(p ProdutoDetalhe) {
-	qtd := v.QunatidadeCabeNoVolume(p)
+func (v *Volume) AdicionarProduto(p Produto) int {
+	if !v.CabeNoVolume(p) {
 
-	if qtd == p.QtdProduto {
-
+		if v.VolumeEstáVazio() {
+			return p.Quantidade
+		}else {
+			return 0
+		}
 	}
+
+	if p.VolumetriaTotal() < v.VolumeRestante {
+		v.Produtos = append(v.Produtos, p)
+	} else {
+		qtd := v.QunatidadeCabeNoVolume(p)
+
+		p.AlterarQuantidade(qtd)
+
+		v.Produtos = append(v.Produtos, p)
+	}
+
+	v.DiminuirVolumetriaRestante(p.VolumetriaTotal())
+
+	return p.Quantidade
 }
 
-func (v *Volume) AdicionarProduto(p Produto, volumeDoProduto float64, qtd int) {
-	p.AdicionarQuantidade(qtd)
+func (v *Volume) DiminuirVolumetriaRestante(volumetria float64) {
+	v.VolumeRestante -= volumetria
+}
 
-	v.VolumeRestante -= float64(p.Quantidade) * volumeDoProduto
-	v.Produtos = append(v.Produtos, p)
+func (v *Volume) CabeNoVolume(p Produto) bool {
+	
+	quantidade := v.QunatidadeCabeNoVolume(p)
+
+	if quantidade <= 0 {
+		return false
+	}
+
+	return true
+}
+
+func (v *Volume) VolumeEstáVazio() bool {
+	tamanho := len(v.Produtos)
+
+	if tamanho <= 0 {
+		return true
+	}else {
+		return false
+	}
 }
 
 type ModeloVolume struct {
